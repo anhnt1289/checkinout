@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check-in</title>
+</head>
+<body>
+  <h2>Click to Check-in</h2>
+  <button onclick="checkGeolocationPermission()">Check-in</button>
+  
+  <p id="location"></p>
+  <p id="result"></p>
+
+  <script>
+	// Kiểm tra quyền truy cập vị trí trước khi yêu cầu
+	function checkGeolocationPermission() {
+	  if (navigator.permissions) {
+		navigator.permissions.query({ name: 'geolocation' }).then(function(permissionStatus) {
+		  if (permissionStatus.state === 'granted') {
+			// Quản lý quyền đã được cấp
+			getLocation();
+		  } else if (permissionStatus.state === 'prompt') {
+			// Yêu cầu quyền
+			getLocation();
+		  } else {
+			// Quyền bị từ chối
+			alert('Permission to access geolocation is denied. Please enable it in your browser settings.');
+		  }
+		});
+	  } else {
+		// Trình duyệt không hỗ trợ Permissions API, mặc định yêu cầu quyền
+		getLocation();
+	  }
+	}
+    // Hàm tính khoảng cách giữa 2 điểm tọa độ
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371; // Radius of the earth in km
+      const dLat = (lat2 - lat1) * (Math.PI / 180);
+      const dLon = (lon2 - lon1) * (Math.PI / 180);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distance = R * c * 1000; // Khoảng cách tính bằng mét
+      return distance;
+    }
+
+    // Danh sách các phạm vi check-in
+    const checkinAreas = [
+      { id: 1, name: "Văn Phòng A", lat: 21.017754, lon: 105.784622, radius: 100 }, 
+      // Có thể thêm các khu vực khác nếu cần
+    ];
+
+    // Lấy vị trí người dùng
+    function getLocation() {
+	  checkDeviceType();
+      if (navigator.geolocation) {
+        // Sử dụng tùy chọn để cải thiện độ chính xác của vị trí
+        navigator.geolocation.getCurrentPosition(showPosition, showError, {
+          enableHighAccuracy: true,  // Kích hoạt chế độ lấy vị trí chính xác
+          timeout: 5000,             // Thời gian tối đa cho phép tìm vị trí (ms)
+          maximumAge: 0              // Không sử dụng kết quả lưu trữ từ trước
+        });
+      } else {
+        document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
+      }
+    }
+
+    function showPosition(position) {
+      var userLat = position.coords.latitude;
+      var userLon = position.coords.longitude;
+
+      document.getElementById("location").innerHTML = `Latitude: ${userLat}<br>Longitude: ${userLon}`;
+
+      // Kiểm tra người dùng có nằm trong phạm vi check-in nào không
+      checkUserLocation(userLat, userLon);
+    }
+
+    function showError(error) {
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          document.getElementById("location").innerHTML = "User denied the request for Geolocation.";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          document.getElementById("location").innerHTML = "Location information is unavailable.";
+          break;
+        case error.TIMEOUT:
+          document.getElementById("location").innerHTML = "The request to get user location timed out.";
+          break;
+        case error.UNKNOWN_ERROR:
+          document.getElementById("location").innerHTML = "An unknown error occurred.";
+          break;
+      }
+    }
+
+    // Hàm kiểm tra xem người dùng có nằm trong phạm vi của các khu vực check-in nào không
+    function checkUserLocation(userLat, userLon) {
+      let isInArea = false;
+
+      // Duyệt qua từng khu vực trong danh sách checkinAreas
+      for (let i = 0; i < checkinAreas.length; i++) {
+        const area = checkinAreas[i];
+
+        // Tính khoảng cách từ người dùng đến khu vực check-in
+        const distance = calculateDistance(userLat, userLon, area.lat, area.lon);
+		
+		// Hiển thị khoảng cách của từng khu vực
+		document.getElementById("result").innerHTML += `Distance to ${area.name}: ${distance.toFixed(2)}m<br>`;
+
+        // Kiểm tra nếu người dùng nằm trong bán kính của khu vực check-in
+        if (distance <= area.radius) {
+          document.getElementById("result").innerHTML += `You are within the check-in area: ${area.name}. Distance: ${distance.toFixed(2)}m`;
+          sendLocationToBackend(userLat, userLon, "checkin", area.id);
+          isInArea = true;
+          break;
+        }
+      }
+
+      if (!isInArea) {
+        document.getElementById("result").innerHTML += `You are outside the check-in area.`;
+        sendLocationToBackend(userLat, userLon, "checkout");
+      }
+    }
+
+    // Gửi dữ liệu tọa độ đến backend (ví dụ thông qua AJAX)
+    function sendLocationToBackend(lat, lon, action, areaId) {
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "your-backend-api-url", true);
+      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      xhr.send(JSON.stringify({
+        latitude: lat,
+        longitude: lon,
+        action: action,   // "checkin" hoặc "checkout"
+        areaId: areaId    // ID khu vực check-in
+      }));
+    }
+	
+	function checkDeviceType() {
+	  const userAgent = navigator.userAgent;
+
+	  // Kiểm tra thiết bị di động
+	  if (/Mobi|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(userAgent)) {
+		console.log("User is on a mobile device.");
+		// Thực hiện hành động dành cho thiết bị di động ở đây
+	  } else {
+		console.log("User is on a desktop or laptop.");
+		// Thực hiện hành động dành cho máy tính để bàn ở đây
+	  }
+	}
+  </script>
+</body>
+</html>
