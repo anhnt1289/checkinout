@@ -116,7 +116,7 @@
 
         // Kiểm tra nếu người dùng nằm trong bán kính của khu vực check-in
         if (distance <= area.radius) {
-          document.getElementById("result").innerHTML += `You are within the check-in area: ${area.name}. Distance: ${distance.toFixed(2)}m`;
+          document.getElementById("result").innerHTML += `You are within the check-in area: ${area.name}. Distance: ${distance.toFixed(2)}m<br>`;
           sendLocationToBackend(userLat, userLon, "checkin", area.id);
           isInArea = true;
           break;
@@ -157,6 +157,7 @@
   </script>
 </body>
 </html>
+
 
 
 
