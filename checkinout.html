@@ -124,7 +124,7 @@
       }
 
       if (!isInArea) {
-        document.getElementById("result").innerHTML += `You are outside the check-in area.`;
+        document.getElementById("result").innerHTML += `You are outside the check-in area.<br>`;
         sendLocationToBackend(userLat, userLon, "checkout");
       }
     }
@@ -157,5 +157,6 @@
   </script>
 </body>
 </html>
+
 
 
