@@ -41,8 +41,8 @@
 
     // Hàm xử lý đăng nhập Google
     function onSignIn(googleUser) {
-      const profile = googleUser.getBasicProfile();
-      const email = profile.getEmail();
+	  const user = googleUser.getBasicProfile();
+      const email = user.getEmail();
       console.log("Logged in as: " + email);
       document.getElementById("google-signin").style.display = "none";  // Ẩn phần đăng nhập sau khi thành công
 
@@ -175,3 +175,4 @@
   </script>
 </body>
 </html>
+
