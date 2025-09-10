@@ -41,13 +41,17 @@
 
     // Hàm xử lý đăng nhập Google
     function onSignIn(googleUser) {
-	  const user = googleUser.getBasicProfile();
-      const email = user.getEmail();
-      console.log("Logged in as: " + email);
+      // Lấy credential (JWT token) từ googleUser
+      const credential = googleUser.credential;
+
+      // Giải mã token JWT và lấy thông tin người dùng
+      const userInfo = parseJwt(credential);
+
+      console.log("Logged in as: " + userInfo.email);
       document.getElementById("google-signin").style.display = "none";  // Ẩn phần đăng nhập sau khi thành công
 
       // Sau khi đăng nhập, tiến hành check-in và gửi thông tin thêm (email, tọa độ,...)
-      getLocation(email);
+      getLocation(userInfo.email);
     }
 
     // Hàm tính khoảng cách giữa 2 điểm tọa độ
@@ -175,4 +179,5 @@
   </script>
 </body>
 </html>
+
 
