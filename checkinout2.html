@@ -154,6 +154,16 @@
         font-size: 0.9rem; /* Giảm kích thước font chữ của thông báo trên di động */
       }
     }
+	  
+	#result {
+      margin-top: 10px;
+      font-size: 1rem;
+      color: #555;
+      max-height: 400px;  /* Giới hạn chiều cao */
+      overflow-y: auto;  /* Hiển thị thanh cuộn khi nội dung vượt quá */
+      padding-right: 10px;  /* Đảm bảo có không gian để thanh cuộn */
+    }
+
   </style>
   <!-- Thêm Google Identity Services (GIS) SDK -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -376,4 +386,5 @@
   </script>
 </body>
 </html>
+
 
