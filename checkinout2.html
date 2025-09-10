@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Check-in & Check-out</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check-in & Check-out</title>
   <style>
     body {
       font-family: 'Poppins', sans-serif;
@@ -110,6 +116,43 @@
 
     #google-signin .g-signin2 {
       display: inline-block;
+    }
+
+    /* Media Query: Thiết kế responsive */
+    @media (max-width: 768px) {
+      h2 {
+        font-size: 2rem; /* Giảm kích thước tiêu đề trên thiết bị di động */
+      }
+
+      .container {
+        width: 90%; /* Chiếm 90% chiều rộng của màn hình trên di động */
+        padding: 20px;
+      }
+
+      button {
+        font-size: 1.2rem; /* Giảm kích thước font chữ của button trên di động */
+        padding: 16px 30px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h2 {
+        font-size: 1.5rem; /* Thay đổi kích thước cho các thiết bị rất nhỏ */
+      }
+
+      button {
+        font-size: 1rem; /* Giảm kích thước button trên các thiết bị di động nhỏ */
+        padding: 12px 25px;
+      }
+
+      .container {
+        width: 95%; /* Cho container rộng hơn để phù hợp với màn hình nhỏ */
+        padding: 15px;
+      }
+
+      #location, #result {
+        font-size: 0.9rem; /* Giảm kích thước font chữ của thông báo trên di động */
+      }
     }
   </style>
   <!-- Thêm Google Identity Services (GIS) SDK -->
@@ -333,3 +376,4 @@
   </script>
 </body>
 </html>
+
