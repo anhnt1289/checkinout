@@ -20,24 +20,35 @@
   <script>
     // Kiểm tra quyền truy cập vị trí trước khi yêu cầu
     function checkGeolocationPermission() {
-      if (navigator.permissions) {
-        navigator.permissions.query({ name: 'geolocation' }).then(function(permissionStatus) {
-          if (permissionStatus.state === 'granted') {
-            // Quản lý quyền đã được cấp
-            getLocation();
-          } else if (permissionStatus.state === 'prompt') {
-            // Yêu cầu quyền
-            getLocation();
-          } else {
-            // Quyền bị từ chối
-            alert('Permission to access geolocation is denied. Please enable it in your browser settings.');
-          }
-        });
-      } else {
-        // Trình duyệt không hỗ trợ Permissions API, mặc định yêu cầu quyền
-        getLocation();
-      }
-    }
+	  if (navigator.permissions) {
+	    navigator.permissions.query({ name: 'geolocation' }).then(function(permissionStatus) {
+	      if (permissionStatus.state === 'granted') {
+	        // Kiểm tra xem người dùng đã đăng nhập chưa, nếu có thì lấy email và gọi getLocation
+	        if (window.userEmail) {
+	          getLocation(window.userEmail);
+	        } else {
+	          alert('Please login first.');
+	        }
+	      } else if (permissionStatus.state === 'prompt') {
+	        // Nếu chưa có quyền, yêu cầu quyền và sau đó gọi getLocation
+	        if (window.userEmail) {
+	          getLocation(window.userEmail);
+	        } else {
+	          alert('Please login first.');
+	        }
+	      } else {
+	        alert('Permission to access geolocation is denied. Please enable it in your browser settings.');
+	      }
+	    });
+	  } else {
+	    // Nếu trình duyệt không hỗ trợ Permissions API, kiểm tra trạng thái đăng nhập và gọi getLocation
+	    if (window.userEmail) {
+	      getLocation(window.userEmail);
+	    } else {
+	      alert('Please login first.');
+	    }
+	  }
+	}
 
     // Hàm giải mã token JWT để lấy thông tin người dùng
     function parseJwt(token) {
@@ -193,6 +204,7 @@
   </script>
 </body>
 </html>
+
 
 
 
