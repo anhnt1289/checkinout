@@ -18,23 +18,26 @@
   <p id="result"></p>
 
   <script>
-    // Kiểm tra quyền truy cập vị trí trước khi yêu cầu
-    function checkGeolocationPermission() {
+	function checkGeolocationPermission() {
 	  if (navigator.permissions) {
 	    navigator.permissions.query({ name: 'geolocation' }).then(function(permissionStatus) {
 	      if (permissionStatus.state === 'granted') {
-	        // Kiểm tra xem người dùng đã đăng nhập chưa, nếu có thì lấy email và gọi getLocation
-	        if (window.userEmail) {
-	          getLocation(window.userEmail);
+	        // Kiểm tra xem người dùng đã đăng nhập và email còn hợp lệ
+	        const loginData = JSON.parse(localStorage.getItem('loginData'));
+	
+	        if (loginData && isLoginValid(loginData.timestamp)) {
+	          getLocation(loginData.email);
 	        } else {
-	          alert('Please login first.');
+	          alert('Session expired. Please login again.');
 	        }
 	      } else if (permissionStatus.state === 'prompt') {
 	        // Nếu chưa có quyền, yêu cầu quyền và sau đó gọi getLocation
-	        if (window.userEmail) {
-	          getLocation(window.userEmail);
+	        const loginData = JSON.parse(localStorage.getItem('loginData'));
+	
+	        if (loginData && isLoginValid(loginData.timestamp)) {
+	          getLocation(loginData.email);
 	        } else {
-	          alert('Please login first.');
+	          alert('Session expired. Please login again.');
 	        }
 	      } else {
 	        alert('Permission to access geolocation is denied. Please enable it in your browser settings.');
@@ -42,12 +45,20 @@
 	    });
 	  } else {
 	    // Nếu trình duyệt không hỗ trợ Permissions API, kiểm tra trạng thái đăng nhập và gọi getLocation
-	    if (window.userEmail) {
-	      getLocation(window.userEmail);
+	    const loginData = JSON.parse(localStorage.getItem('loginData'));
+	
+	    if (loginData && isLoginValid(loginData.timestamp)) {
+	      getLocation(loginData.email);
 	    } else {
-	      alert('Please login first.');
+	      alert('Session expired. Please login again.');
 	    }
 	  }
+	}
+	
+	// Kiểm tra xem phiên đăng nhập còn hợp lệ (dưới 30 phút)
+	function isLoginValid(timestamp) {
+	  const thirtyMinutesInMillis = 30 * 60 * 1000; // 30 phút tính bằng mili giây
+	  return (Date.now() - timestamp) <= thirtyMinutesInMillis;
 	}
 
     // Hàm giải mã token JWT để lấy thông tin người dùng
@@ -68,7 +79,13 @@
 
       // Giải mã token JWT và lấy thông tin người dùng
       const userInfo = parseJwt(credential);
-
+	  // Lưu email và thời gian (timestamp) vào localStorage
+	  const loginData = {
+		email: userInfo.email,
+		timestamp: Date.now()  // Thời gian hiện tại tính bằng mili giây
+	  };
+	
+	  localStorage.setItem('loginData', JSON.stringify(loginData));
       // Thông tin người dùng
       const email = userInfo.email;
       console.log("Logged in as: " + email);
@@ -204,6 +221,7 @@
   </script>
 </body>
 </html>
+
 
 
 
