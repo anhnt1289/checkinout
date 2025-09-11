@@ -154,6 +154,59 @@
         font-size: 0.9rem; /* Giảm kích thước font chữ của thông báo trên di động */
       }
     }
+
+
+	  /* Style Dialogy */
+	  .custom-dialog-overlay {
+	    position: fixed;
+	    top: 0;
+	    left: 0;
+	    width: 100%;
+	    height: 100%;
+	    background: rgba(0, 0, 0, 0.4);
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    z-index: 9999;
+	  }
+	
+	  /* Style cho hộp thoại */
+	  .custom-dialog {
+	    background: white;
+	    border-radius: 12px;
+	    padding: 20px;
+	    width: 300px;
+	    text-align: center;
+	    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+	    animation: fadeIn 0.3s ease;
+	  }
+	
+	  .custom-dialog h3 {
+	    margin: 0 0 10px;
+	  }
+	
+	  .custom-dialog.success h3 {
+	    color: green;
+	  }
+	
+	  .custom-dialog.fail h3 {
+	    color: red;
+	  }
+	
+	  .custom-dialog button {
+	    margin-top: 10px;
+	    padding: 6px 12px;
+	    border: none;
+	    background: #007bff;
+	    color: white;
+	    border-radius: 6px;
+	    cursor: pointer;
+	  }
+	
+	  @keyframes fadeIn {
+	    from { opacity: 0; transform: translateY(-10px); }
+	    to { opacity: 1; transform: translateY(0); }
+	  }
   </style>
   <!-- Thêm Google Identity Services (GIS) SDK -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -292,27 +345,19 @@
 
     // Xử lý khi API trả về
 	xhr.onload = function () {
-	  if (xhr.status === 200) {
-	    console.log("Location and email data successfully sent:", xhr.responseText);
-	
-	    try {
-	      const response = JSON.parse(xhr.responseText);
-	
-	      // Tạo tiêu đề dựa trên status
-	      const title = response.status === "success" ? "✅ SUCCESS" : "❌ FAIL";
-	
-	      // Hiển thị alert với 2 dòng
-	      alert(`${title}\n${response.message}`);
-	
-	    } catch (e) {
-	      console.error("Failed to parse response:", e);
-	      alert("❌ FAIL\nInvalid response from server");
-	    }
-	
-	  } else {
-	    console.error("Failed to send data:", xhr.status, xhr.statusText, xhr.responseText);
-	    alert(`❌ FAIL\nFailed to send data: ${xhr.status} ${xhr.statusText}`);
-	  }
+		if (xhr.status === 200) {
+		  console.log("Location and email data successfully sent:", xhr.responseText);
+		  try {
+			const response = JSON.parse(xhr.responseText);
+			showDialog(response.status, response.message);
+		  } catch (e) {
+			console.error("Failed to parse response:", e);
+			showDialog("fail", "Invalid response from server");
+		  }
+		} else {
+		  console.error("Failed to send data:", xhr.status, xhr.statusText, xhr.responseText);
+		  showDialog("fail", `Failed to send data: ${xhr.status} ${xhr.statusText}`);
+		}
 	};
 
     // Xử lý lỗi kết nối
@@ -346,9 +391,31 @@
     window.onload = function() {
       checkGoogleLogin();
     }
+	  
+	function showDialog(status, message) {
+		// Tạo overlay
+		const overlay = document.createElement("div");
+		overlay.className = "custom-dialog-overlay";
+		
+		// Tạo hộp thoại
+		const dialog = document.createElement("div");
+		dialog.className = `custom-dialog ${status === "success" ? "success" : "fail"}`;
+		dialog.innerHTML = `
+		  <h3>${status === "success" ? "✅ SUCCESS" : "❌ FAIL"}</h3>
+		  <p>${message}</p>
+		  <button>OK</button>
+		`;
+		
+		overlay.appendChild(dialog);
+		document.body.appendChild(overlay);
+		
+		// Đóng dialog khi bấm nút
+		dialog.querySelector("button").onclick = () => overlay.remove();
+	}
   </script>
 </body>
 </html>
+
 
 
 
