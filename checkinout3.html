@@ -291,13 +291,25 @@
     console.log("Sending JSON payload:", payload);
 
     // Xử lý khi API trả về
-    xhr.onload = function () {
-      if (xhr.status === 200) {
-        console.log("Location and email data successfully sent:", xhr.responseText);
-      } else {
-        console.error("Failed to send data:", xhr.status, xhr.statusText, xhr.responseText);
-      }
-    };
+	xhr.onload = function () {
+	  if (xhr.status === 200) {
+	    console.log("Location and email data successfully sent:", xhr.responseText);
+	
+	    // Parse JSON và alert message
+	    try {
+	      const response = JSON.parse(xhr.responseText);
+	      if (response.message) {
+	        alert(response.message);
+	      }
+	    } catch (e) {
+	      console.error("Failed to parse response:", e);
+	    }
+	
+	  } else {
+	    console.error("Failed to send data:", xhr.status, xhr.statusText, xhr.responseText);
+	    alert("Failed to send data: " + xhr.status + " " + xhr.statusText);
+	  }
+	};
 
     // Xử lý lỗi kết nối
     xhr.onerror = function () {
@@ -333,6 +345,7 @@
   </script>
 </body>
 </html>
+
 
 
 
