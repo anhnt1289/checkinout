@@ -1,4 +1,4 @@
-package com.mm.timesheet.Utility;
+package com.mm.timesheet;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
