@@ -295,19 +295,23 @@
 	  if (xhr.status === 200) {
 	    console.log("Location and email data successfully sent:", xhr.responseText);
 	
-	    // Parse JSON và alert message
 	    try {
 	      const response = JSON.parse(xhr.responseText);
-	      if (response.message) {
-	        alert(response.message);
-	      }
+	
+	      // Tạo tiêu đề dựa trên status
+	      const title = response.status === "success" ? "✅ SUCCESS" : "❌ FAIL";
+	
+	      // Hiển thị alert với 2 dòng
+	      alert(`${title}\n${response.message}`);
+	
 	    } catch (e) {
 	      console.error("Failed to parse response:", e);
+	      alert("❌ FAIL\nInvalid response from server");
 	    }
 	
 	  } else {
 	    console.error("Failed to send data:", xhr.status, xhr.statusText, xhr.responseText);
-	    alert("Failed to send data: " + xhr.status + " " + xhr.statusText);
+	    alert(`❌ FAIL\nFailed to send data: ${xhr.status} ${xhr.statusText}`);
 	  }
 	};
 
@@ -345,6 +349,7 @@
   </script>
 </body>
 </html>
+
 
 
 
