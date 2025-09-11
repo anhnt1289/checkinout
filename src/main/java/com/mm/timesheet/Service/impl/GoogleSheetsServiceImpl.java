@@ -48,7 +48,7 @@ public class GoogleSheetsServiceImpl implements GoogleSheetsService {
                 // Kiểm tra vị trí người dùng
                 if (checkUserLocation(locationInfoDTO.getLat(), locationInfoDTO.getLon(),
                         locationInfoDTO.getAction(), checkInAreas, message)) {
-                    saveGoogleSheet(locationInfoDTO, spreadsheetId, range);
+                    saveGoogleSheet(locationInfoDTO, spreadsheetId, range, message.toString());
                 }
                 break;
             }
@@ -56,7 +56,7 @@ public class GoogleSheetsServiceImpl implements GoogleSheetsService {
         return message;
     }
     private void saveGoogleSheet(LocationRequestDto locationInfoDTO,
-            String spreadsheetId, String range) throws Exception {
+            String spreadsheetId, String range, String message) throws Exception {
         Sheets service = getSheetsService();
         // Lấy thời gian hiện tại (ngày tháng năm giờ phút)
         String formattedDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
@@ -64,7 +64,7 @@ public class GoogleSheetsServiceImpl implements GoogleSheetsService {
         // Dữ liệu bạn muốn ghi vào Google Sheets
         List<List<Object>> values = List.of(
                 Arrays.asList(locationInfoDTO.getLat(), locationInfoDTO.getLon(),
-                        locationInfoDTO.getAction(), locationInfoDTO.getUser(), formattedDateTime)
+                        locationInfoDTO.getAction(), locationInfoDTO.getUser(), formattedDateTime, message)
         );
 
         ValueRange body = new ValueRange().setValues(values);
