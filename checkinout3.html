@@ -274,33 +274,39 @@
     }
 
     // Gửi dữ liệu tọa độ và email đến backend
-	function sendLocationToBackend(lat, lon, action, email) {
-	  const xhr = new XMLHttpRequest();
-	  xhr.open("POST", "https://checkout-production.up.railway.app/api/location/send", true);
-	  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  // Gửi dữ liệu tọa độ và email đến backend
+  function sendLocationToBackend(lat, lon, action, email) {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "https://checkinout-production.up.railway.app/api/location/send", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
 
-	  // Tạo chuỗi dữ liệu dưới dạng URL-encoded
-	  const data = `lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&action=${encodeURIComponent(action)}&user=${encodeURIComponent(email)}`;
+    // Tạo JSON object khớp với LocationRequestDto
+    const payload = {
+      lat: lat,
+      lon: lon,
+      action: action,
+      user: email
+    };
 
-	  console.log("Sending data:", data);  // Kiểm tra dữ liệu trước khi gửi đi
+    console.log("Sending JSON payload:", payload);
 
-	  // Xử lý khi API trả về
-	  xhr.onload = function() {
-		if (xhr.status === 200) {
-		  console.log("Location and email data successfully sent:", xhr.responseText);
-		} else {
-		  console.error("Failed to send data:", xhr.status, xhr.statusText);
-		}
-	  };
+    // Xử lý khi API trả về
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        console.log("Location and email data successfully sent:", xhr.responseText);
+      } else {
+        console.error("Failed to send data:", xhr.status, xhr.statusText, xhr.responseText);
+      }
+    };
 
-	  // Xử lý lỗi kết nối
-	  xhr.onerror = function() {
-		console.error("Network error occurred while sending location data.");
-	  };
+    // Xử lý lỗi kết nối
+    xhr.onerror = function () {
+      console.error("Network error occurred while sending location data.");
+    };
 
-	  // Gửi dữ liệu
-	  xhr.send(data);
-	}
+    // Gửi dữ liệu dưới dạng JSON
+    xhr.send(JSON.stringify(payload));
+  }
 
 
     // Kiểm tra trạng thái đăng nhập Google
@@ -327,6 +333,7 @@
   </script>
 </body>
 </html>
+
 
 
 
