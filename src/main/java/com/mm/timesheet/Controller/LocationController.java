@@ -1,6 +1,6 @@
 package com.mm.timesheet.Controller;
 
-import com.mm.timesheet.Dto.LocationInfoDto;
+import com.mm.timesheet.Dto.LocationRequestDto;
 import com.mm.timesheet.Dto.ResponseDto;
 import com.mm.timesheet.Service.GoogleSheetsService;
 import org.apache.logging.log4j.LogManager;
@@ -23,27 +23,21 @@ public class LocationController {
     }
 
     @PostMapping("/send")
-    public ResponseEntity<ResponseDto> sendLocation(
-            @RequestParam double lat,
-            @RequestParam double lon,
-            @RequestParam String action,
-            @RequestParam String areaId,
-            @RequestParam String user) {
+    public ResponseEntity<ResponseDto> sendLocation(@RequestBody LocationRequestDto request) {
 
-        logger.info("Received location data: lat={}, lon={}, action={}, areaId={}, user={}", lat, lon, action, areaId, user);
+        logger.info("Received location data: {}", request.toString());
 
         ResponseDto responseDto;
         try {
             // Khởi tạo đối tượng LocationInfoDto
-            LocationInfoDto locationInfoDTO = new LocationInfoDto(lat, lon, action, areaId, user);
 
             // Lưu dữ liệu vào Google Sheets và nhận thông điệp phản hồi
-            StringBuilder message = googleSheetsService.saveCheckInOutToGoogleSheet(locationInfoDTO);
+            StringBuilder message = googleSheetsService.saveCheckInOutToGoogleSheet(request);
 
             // Kiểm tra và xử lý thông điệp trả về từ việc lưu vào Google Sheets
             String status = StringUtils.isEmpty(message.toString()) ? "error" : "success";
             String responseMessage = StringUtils.isEmpty(message.toString()) ?
-                    String.format("User not exist: %s", user) : message.toString();
+                    String.format("User not exist: %s", request.getUser()) : message.toString();
 
             // Tạo đối tượng ResponseDto với thông tin phản hồi
             responseDto = createResponse(status, responseMessage);
@@ -54,7 +48,7 @@ public class LocationController {
 
         } catch (Exception e) {
             // Log lỗi khi xảy ra ngoại lệ
-            logger.error("Error saving location data for user {}: {}", user, e.getMessage(), e);
+            logger.error("Error saving location data for user {}: {}", request.getUser(), e.getMessage(), e);
 
             // Tạo đối tượng ResponseDto cho kết quả lỗi
             responseDto = createResponse("error", "Failed to save location data: " + e.getMessage());

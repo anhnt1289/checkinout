@@ -6,7 +6,7 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import com.mm.timesheet.Dto.CheckInAreaDto;
-import com.mm.timesheet.Dto.LocationInfoDto;
+import com.mm.timesheet.Dto.LocationRequestDto;
 import com.mm.timesheet.Service.GoogleSheetsService;
 import com.mm.timesheet.Utility.GoogleSheetsCache;
 import org.apache.logging.log4j.LogManager;
@@ -25,7 +25,7 @@ public class GoogleSheetsServiceImpl implements GoogleSheetsService {
 
     private static final Logger logger = LogManager.getLogger(GoogleSheetsServiceImpl.class);
     @Override
-    public StringBuilder saveCheckInOutToGoogleSheet(LocationInfoDto locationInfoDTO) throws Exception {
+    public StringBuilder saveCheckInOutToGoogleSheet(LocationRequestDto locationInfoDTO) throws Exception {
         StringBuilder message = new StringBuilder();
         ObjectMapper objectMapper = new ObjectMapper();
         // Lấy dữ liệu từ cache hoặc từ Google Sheets nếu không có cache
@@ -55,7 +55,7 @@ public class GoogleSheetsServiceImpl implements GoogleSheetsService {
         }
         return message;
     }
-    private void saveGoogleSheet(LocationInfoDto locationInfoDTO,
+    private void saveGoogleSheet(LocationRequestDto locationInfoDTO,
             String spreadsheetId, String range) throws Exception {
         Sheets service = getSheetsService();
         // Lấy thời gian hiện tại (ngày tháng năm giờ phút)
@@ -64,8 +64,7 @@ public class GoogleSheetsServiceImpl implements GoogleSheetsService {
         // Dữ liệu bạn muốn ghi vào Google Sheets
         List<List<Object>> values = List.of(
                 Arrays.asList(locationInfoDTO.getLat(), locationInfoDTO.getLon(),
-                        locationInfoDTO.getAction(), locationInfoDTO.getAreaId(),
-                        locationInfoDTO.getUser(), formattedDateTime)
+                        locationInfoDTO.getAction(), locationInfoDTO.getUser(), formattedDateTime)
         );
 
         ValueRange body = new ValueRange().setValues(values);
