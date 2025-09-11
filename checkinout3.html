@@ -349,14 +349,18 @@
 		  console.log("Location and email data successfully sent:", xhr.responseText);
 		  try {
 			const response = JSON.parse(xhr.responseText);
-			showDialog(response.status, response.message);
+		
+			// ✅ Chỉ dùng message để xác định success/fail
+			const isSuccess = response.message.includes("You are within");
+		
+			showDialog(isSuccess, response.message);
 		  } catch (e) {
 			console.error("Failed to parse response:", e);
-			showDialog("fail", "Invalid response from server");
+			showDialog(false, "Invalid response from server");
 		  }
 		} else {
 		  console.error("Failed to send data:", xhr.status, xhr.statusText, xhr.responseText);
-		  showDialog("fail", `Failed to send data: ${xhr.status} ${xhr.statusText}`);
+		  showDialog(false, `Failed to send data: ${xhr.status} ${xhr.statusText}`);
 		}
 	};
 
@@ -392,16 +396,14 @@
       checkGoogleLogin();
     }
 	  
-	function showDialog(status, message) {
-		// Tạo overlay
+	function showDialog(isSuccess, message) {
 		const overlay = document.createElement("div");
 		overlay.className = "custom-dialog-overlay";
 		
-		// Tạo hộp thoại
 		const dialog = document.createElement("div");
-		dialog.className = `custom-dialog ${status === "success" ? "success" : "fail"}`;
+		dialog.className = `custom-dialog ${isSuccess ? "success" : "fail"}`;
 		dialog.innerHTML = `
-		  <h3>${status === "success" ? "✅ SUCCESS" : "❌ FAIL"}</h3>
+		  <h3>${isSuccess ? "✅ SUCCESS" : "❌ FAIL"}</h3>
 		  <p>${message}</p>
 		  <button>OK</button>
 		`;
@@ -409,12 +411,12 @@
 		overlay.appendChild(dialog);
 		document.body.appendChild(overlay);
 		
-		// Đóng dialog khi bấm nút
 		dialog.querySelector("button").onclick = () => overlay.remove();
 	}
   </script>
 </body>
 </html>
+
 
 
 
