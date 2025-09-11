@@ -247,9 +247,6 @@
       console.log("Logged in as: " + email);
 
       document.getElementById("google-signin").style.display = "none"; // Ẩn nút đăng nhập sau khi thành công
-
-      // Sau khi đăng nhập, tiến hành check-in và gửi thông tin thêm (email, tọa độ,...)
-      getLocation(email);
     }
 
     // Lấy vị trí người dùng
@@ -263,7 +260,6 @@
           document.getElementById("location").innerHTML = `Latitude: ${userLat}<br>Longitude: ${userLon}`;
 
           // Kiểm tra người dùng có nằm trong phạm vi check-in nào không
-          checkUserLocation(userLat, userLon, email, action);
 		  sendLocationToBackend(userLat, userLon, action, email);
         }, function(error) {
           document.getElementById("location").innerHTML = "Location error: " + error.message;
@@ -278,13 +274,13 @@
     }
 
     // Gửi dữ liệu tọa độ và email đến backend
-	function sendLocationToBackend(lat, lon, action, areaId, email) {
+	function sendLocationToBackend(lat, lon, action, email) {
 	  const xhr = new XMLHttpRequest();
 	  xhr.open("POST", "https://checkout-production.up.railway.app/api/location/send", true);
 	  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
 	  // Tạo chuỗi dữ liệu dưới dạng URL-encoded
-	  const data = `lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&action=${encodeURIComponent(action)}&areaId=${encodeURIComponent(areaId)}&user=${encodeURIComponent(email)}`;
+	  const data = `lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&action=${encodeURIComponent(action)}&user=${encodeURIComponent(email)}`;
 
 	  console.log("Sending data:", data);  // Kiểm tra dữ liệu trước khi gửi đi
 
@@ -331,6 +327,7 @@
   </script>
 </body>
 </html>
+
 
 
 
