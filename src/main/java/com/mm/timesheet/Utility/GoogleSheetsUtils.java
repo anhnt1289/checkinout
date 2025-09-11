@@ -10,7 +10,9 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import static com.mm.timesheet.Utility.GoogleSheetsConst.APPLICATION_NAME;
@@ -28,10 +30,11 @@ public class GoogleSheetsUtils {
     }
 
     public static Sheets getSheetsService() throws Exception {
-        FileInputStream serviceAccountStream = new FileInputStream(googleApiKey);
-        GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccountStream)
-                .createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS));
-
+//        FileInputStream serviceAccountStream = new FileInputStream(googleApiKey);
+//        GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccountStream)
+//                .createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS));
+        GoogleCredentials credentials = GoogleCredentials
+                .fromStream(new ByteArrayInputStream(googleApiKey.getBytes(StandardCharsets.UTF_8)));
         return new Sheets.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(),
                 GsonFactory.getDefaultInstance(),
