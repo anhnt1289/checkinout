@@ -238,7 +238,7 @@
 	          getLocation(loginData.email, action);
 	        } else {
 	          alert('Session expired. Please login again.');
-			  document.getElementById("google-signin").style.display = "block"; // Hiển thị nút đăng nhập Google
+			  checkGoogleLogin();
 	        }
 	      } else if (permissionStatus.state === 'prompt') {
 	        // Nếu chưa có quyền, yêu cầu quyền và sau đó gọi getLocation
@@ -248,7 +248,7 @@
 	          getLocation(loginData.email, action);
 	        } else {
 	          alert('Session expired. Please login again.');
-			  document.getElementById("google-signin").style.display = "block"; // Hiển thị nút đăng nhập Google
+			  checkGoogleLogin();
 	        }
 	      } else {
 	        alert('Permission to access geolocation is denied. Please enable it in your browser settings.');
@@ -419,6 +419,7 @@
   </script>
 </body>
 </html>
+
 
 
 
