@@ -14,6 +14,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -59,8 +61,12 @@ public class GoogleSheetsServiceImpl implements GoogleSheetsService {
             String spreadsheetId, String range, String message) throws Exception {
         Sheets service = getSheetsService();
         // Lấy thời gian hiện tại (ngày tháng năm giờ phút)
-        String formattedDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+//        String formattedDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        // Lấy thời gian theo múi giờ Việt Nam (GMT+7)
+        ZonedDateTime vietnamTime = ZonedDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
 
+        // Định dạng thời gian theo kiểu yyyy-MM-dd HH:mm
+        String formattedDateTime = vietnamTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         // Dữ liệu bạn muốn ghi vào Google Sheets
         List<List<Object>> values = List.of(
                 Arrays.asList(locationInfoDTO.getLat(), locationInfoDTO.getLon(),
