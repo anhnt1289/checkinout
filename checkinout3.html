@@ -238,6 +238,7 @@
 	          getLocation(loginData.email, action);
 	        } else {
 	          alert('Session expired. Please login again.');
+			  document.getElementById("google-signin").style.display = "block"; // Hiển thị nút đăng nhập Google
 	        }
 	      } else if (permissionStatus.state === 'prompt') {
 	        // Nếu chưa có quyền, yêu cầu quyền và sau đó gọi getLocation
@@ -247,6 +248,7 @@
 	          getLocation(loginData.email, action);
 	        } else {
 	          alert('Session expired. Please login again.');
+			  document.getElementById("google-signin").style.display = "block"; // Hiển thị nút đăng nhập Google
 	        }
 	      } else {
 	        alert('Permission to access geolocation is denied. Please enable it in your browser settings.');
@@ -367,6 +369,7 @@
     // Xử lý lỗi kết nối
     xhr.onerror = function () {
       console.error("Network error occurred while sending location data.");
+	  showDialog(false, "Invalid response from server");
     };
 
     // Gửi dữ liệu dưới dạng JSON
@@ -416,6 +419,7 @@
   </script>
 </body>
 </html>
+
 
 
 
