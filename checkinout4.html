@@ -278,7 +278,7 @@
     <!-- Bản đồ -->
     <div id="map"></div>
     <!-- Liên kết View History -->
-    <button class="view-history" id="view-history-button" style="display: none;" onclick="window.location.href='/checkinout/history.html'">View History</button>
+    <button class="view-history" id="view-history-button" style="display: none;" onclick="window.open('/checkinout/history.html', '_blank')">View History</button>
   </div>
 
   <script>
@@ -307,8 +307,6 @@
             const loginData = JSON.parse(localStorage.getItem('loginData'));
             if (loginData && isLoginValid(loginData.timestamp)) {
               getLocation(loginData.email, action);
-              // Nếu đăng nhập hợp lệ, hiển thị nút "View History"
-              document.getElementById('view-history-button').style.display = 'block';
             } else {
               showDialog();
               checkGoogleLogin();
@@ -348,7 +346,6 @@
           const userLat = position.coords.latitude;
           const userLon = position.coords.longitude;
           document.getElementById("location").innerHTML = `Latitude: ${userLat}<br>Longitude: ${userLon}`;
-          initMap(userLat, userLon);
           sendLocationToBackend(userLat, userLon, action, email);
         }, function(error) {
           document.getElementById("location").innerHTML = "Location error: " + error.message;
@@ -367,6 +364,9 @@
             const response = JSON.parse(xhr.responseText);
             const isSuccess = response.message.includes("You are within");
             showDialog(isSuccess, response.message);
+			initMap(userLat, userLon);
+			// Nếu đăng nhập hợp lệ, hiển thị nút "View History"
+			document.getElementById('view-history-button').style.display = 'block';
           } catch (e) {
             showDialog(false, "Invalid response from server");
           }
@@ -416,6 +416,7 @@
   </script>
 </body>
 </html>
+
 
 
 
