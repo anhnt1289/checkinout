@@ -254,6 +254,65 @@
     .overlay.show {
         display: block;
     }
+
+	.loading-spinner {
+	    position: fixed;
+	    top: 0;
+	    left: 0;
+	    width: 100%;
+	    height: 100%;
+	    background: rgba(0, 0, 0, 0.5); /* Màu nền mờ */
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    z-index: 9999; /* Đảm bảo spinner xuất hiện trên các phần tử khác */
+	  }
+	
+	  .spinner {
+	    text-align: center;
+	    padding: 20px;
+	    background-color: white;
+	    border-radius: 10px;
+	    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	    max-width: 300px; /* Đảm bảo spinner không quá rộng trên các màn hình lớn */
+	    width: 80%; /* Đảm bảo phù hợp với các màn hình nhỏ */
+	  }
+	
+	  .spinner-img {
+	    width: 60px;
+	    height: 60px;
+	    margin-bottom: 10px;
+	  }
+	
+	  .spinner-text {
+	    font-size: 1.2rem;
+	    font-weight: bold;
+	    color: #333;
+	    margin-top: 10px;
+	  }
+	
+	  /* Responsive: Giảm kích thước spinner trên các màn hình nhỏ */
+	  @media (max-width: 768px) {
+	    .spinner-img {
+	      width: 50px;
+	      height: 50px;
+	    }
+	
+	    .spinner-text {
+	      font-size: 1rem;
+	    }
+	  }
+	
+	  @media (max-width: 480px) {
+	    .spinner-img {
+	      width: 40px;
+	      height: 40px;
+	    }
+	
+	    .spinner-text {
+	      font-size: 0.9rem;
+	    }
+	  }
   </style>
 
   <!-- Google Identity Services -->
@@ -264,10 +323,12 @@
 <body>
   <h2>Click to Check-in or Check-out</h2>
   <!-- Phần tử spinner cho trạng thái chờ -->
-  <div id="loading-spinner" style="display: none; text-align: center;">
-    <img src="https://i.gifer.com/YCZH.gif" alt="Loading..." style="width: 50px; height: 50px;">
-    <p>Đang chờ...</p>
-  </div>
+  <div id="loading-spinner" class="loading-spinner" style="display: none;">
+    <div class="spinner">
+      <img src="https://i.gifer.com/YCZH.gif" alt="Loading..." class="spinner-img">
+      <p class="spinner-text">Đang chờ...</p>
+    </div>
+</div>
   <!-- Màn che nền -->
   <div class="overlay" id="overlay"></div>
 	
@@ -372,7 +433,7 @@
 
     function sendLocationToBackend(lat, lon, action, email) {
 	  // Hiển thị spinner
-  	  document.getElementById('loading-spinner').style.display = 'block';
+  	  document.getElementById('loading-spinner').style.display = 'flex';
       const xhr = new XMLHttpRequest();
       xhr.open("POST", "https://checkinout-production.up.railway.app/api/location/send", true);
       xhr.setRequestHeader("Content-Type", "application/json");
@@ -392,13 +453,15 @@
             showDialogAfterCallAPI(false, "Invalid response from server");
           }
         } else {
-          showDialogAfterCallAPI(false, `Failed: ${xhr.status}`);
 	      // Ẩn spinner khi có phản hồi
 	      document.getElementById('loading-spinner').style.display = 'none';
+          showDialogAfterCallAPI(false, `Failed: ${xhr.status}`);
         }
       };
-      xhr.onerror = function () { 
-		  showDialogAfterCallAPI(false, "Network error"); 
+      xhr.onerror = function () {
+    	// Ẩn spinner khi có lỗi
+    	document.getElementById('loading-spinner').style.display = 'none';
+		showDialogAfterCallAPI(false, "Network error"); 
 	  };
       xhr.send(JSON.stringify(payload));
     }
@@ -441,6 +504,7 @@
   </script>
 </body>
 </html>
+
 
 
 
