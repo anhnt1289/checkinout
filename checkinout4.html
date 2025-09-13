@@ -175,6 +175,85 @@
     .view-history:hover {
       background-color: #0056b3;
     }
+    
+    /* Các thuộc tính chung cho dialog */
+    .dialog {
+        display: none; /* Ẩn dialog mặc định */
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        width: 80%;
+        max-width: 400px;
+        z-index: 1000;
+    }
+
+    /* Màn che nền khi hiển thị dialog */
+    .overlay {
+        display: none; /* Ẩn nền */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+
+    /* Tiêu đề của dialog */
+    .dialog-header {
+        font-size: 18px;
+        font-weight: bold;
+        color: #ff5733;
+        margin-bottom: 10px;
+    }
+
+    /* Nội dung của dialog */
+    .dialog-message {
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    /* Nút đóng của dialog */
+    .close-btn {
+        background-color: #ff5733;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .close-btn:hover {
+        background-color: #e04e2d;
+    }
+
+    /* Hiệu ứng khi dialog hiển thị */
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -60%);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    /* Áp dụng hiệu ứng cho dialog */
+    .dialog.show {
+        display: block;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .overlay.show {
+        display: block;
+    }
   </style>
 
   <!-- Google Identity Services -->
@@ -228,9 +307,13 @@
             const loginData = JSON.parse(localStorage.getItem('loginData'));
             if (loginData && isLoginValid(loginData.timestamp)) {
               getLocation(loginData.email, action);
+              // Nếu đăng nhập hợp lệ, hiển thị nút "View History"
+              document.getElementById('view-history-button').style.display = 'block';
             } else {
-              alert('Session expired. Please login again.');
+              showDialog();
               checkGoogleLogin();
+              // Nếu phiên không hợp lệ, ẩn nút "View History"
+              document.getElementById('view-history-button').style.display = 'none';
             }
           } else {
             alert('Permission to access geolocation is denied.');
@@ -317,8 +400,22 @@
       document.body.appendChild(overlay);
       dialog.querySelector("button").onclick = () => overlay.remove();
     }
+	
+	  // Hàm hiển thị dialog
+    function showDialog() {
+        document.getElementById("overlay").classList.add("show");
+        document.getElementById("dialog").classList.add("show");
+    }
+
+    // Hàm đóng dialog
+    function closeDialog() {
+        document.getElementById("overlay").classList.remove("show");
+        document.getElementById("dialog").classList.remove("show");
+        // Redirect or take other actions after closing dialog
+    }
   </script>
 </body>
 </html>
+
 
 
