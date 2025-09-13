@@ -195,7 +195,9 @@
             showDialog();
         }
     };
-
+    function isLoginValid(timestamp) {
+      return (Date.now() - timestamp) <= 30 * 60 * 1000;
+    }
     // Hàm tải lịch sử check-in/check-out từ API
     function loadCheckInOutHistory(userLogin) {
         const xhr = new XMLHttpRequest();
@@ -255,3 +257,4 @@
 
 </body>
 </html>
+
