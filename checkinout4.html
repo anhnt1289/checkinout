@@ -112,6 +112,50 @@
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    /* Điều chỉnh cho các màn hình di động */
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+    
+      h2 {
+        font-size: 2rem; /* Giảm kích thước tiêu đề */
+        margin-bottom: 20px;
+      }
+    
+      .container {
+        width: 100%;
+        padding: 20px;
+      }
+    
+      .buttons-container {
+        gap: 15px;
+      }
+    
+      button {
+        font-size: 1.3rem; /* Giảm kích thước chữ trên nút */
+      }
+    
+      #map {
+        height: 200px; /* Giảm chiều cao bản đồ trên màn hình nhỏ */
+      }
+    }
+    
+    /* Điều chỉnh cho màn hình cực nhỏ (ví dụ: điện thoại di động cỡ nhỏ) */
+    @media (max-width: 480px) {
+      h2 {
+        font-size: 1.5rem;
+      }
+    
+      button {
+        padding: 15px 30px;
+        font-size: 1.1rem;
+      }
+    
+      #map {
+        height: 180px; /* Giảm chiều cao bản đồ thêm */
+      }
+    }
   </style>
 
   <!-- Google Identity Services -->
@@ -255,3 +299,4 @@
   </script>
 </body>
 </html>
+
