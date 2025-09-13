@@ -12,14 +12,11 @@ import com.mm.timesheet.Utility.GoogleSheetsCache;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import static com.mm.timesheet.Utility.GoogleSheetsUtils.calculateDistance;
 import static com.mm.timesheet.Utility.GoogleSheetsUtils.getSheetsService;
 @Service
@@ -57,6 +54,85 @@ public class GoogleSheetsServiceImpl implements GoogleSheetsService {
         }
         return message;
     }
+
+    @Override
+    public List<List<Object>> loadCheckInOutHistory(String userLogin) throws Exception {
+        List<Map<String, String>> sheetData = GoogleSheetsCache.getSheetData();
+        for (Map<String, String> data : sheetData) {
+            // Lấy giá trị user từ Map
+            String user = data.get("user");
+            String spreadsheetId = data.get("spreadsheetId");
+            String range = data.get("range");
+
+            // Kiểm tra xem user
+            if (userLogin.equals(user)) {
+                List<List<Object>> rows = getSheetData(spreadsheetId, range);
+                // Lọc và xử lý dữ liệu theo yêu cầu
+                List<List<Object>> filteredData = filterAndProcessData(rows, userLogin);
+                return filteredData;
+            }
+        }
+        return null;
+    }
+    // Lấy dữ liệu từ Google Sheets
+    private List<List<Object>> getSheetData(String spreadsheetId, String range) throws Exception {
+        Sheets service = getSheetsService();
+        ValueRange response = service.spreadsheets().values()
+                .get(spreadsheetId, range)
+                .execute();
+        return response.getValues();
+    }
+    // Hàm xử lý lọc và nhóm dữ liệu
+    private List<List<Object>> filterAndProcessData(List<List<Object>> rows, String email) {
+        // Lọc dữ liệu theo email
+        List<List<Object>> filteredData = rows.stream()
+                .filter(row -> row.size() > 3 && row.get(3).equals(email)) // Cột 4 (index 3) là email
+                .collect(Collectors.toList());
+
+        // Nhóm dữ liệu theo ngày và lọc check-in/check-out
+        Map<String, Map<String, List<List<Object>>>> groupedData = new HashMap<>();
+
+        for (List<Object> row : filteredData) {
+            String date = row.get(4).toString().split(" ")[0]; // Lấy phần ngày từ cột thời gian
+            String action = row.get(2).toString();
+
+            groupedData.putIfAbsent(date, new HashMap<>());
+            Map<String, List<List<Object>>> dayData = groupedData.get(date);
+            dayData.putIfAbsent(action, new ArrayList<>());
+            dayData.get(action).add(row);
+        }
+
+        // Lọc check-in và check-out
+        List<List<Object>> result = new ArrayList<>();
+        for (Map.Entry<String, Map<String, List<List<Object>>>> entry : groupedData.entrySet()) {
+            String date = entry.getKey();
+            Map<String, List<List<Object>>> actions = entry.getValue();
+
+            // Lọc check-in (lấy check-in sớm nhất)
+            List<List<Object>> checkinList = actions.get("checkin");
+            if (checkinList != null && !checkinList.isEmpty()) {
+                List<Object> earliestCheckin = checkinList.stream()
+                        .min(Comparator.comparing(o -> o.get(4).toString())) // Lấy check-in sớm nhất
+                        .orElse(null);
+                if (earliestCheckin != null) result.add(earliestCheckin);
+            }
+
+            // Lọc check-out (lấy check-out muộn nhất)
+            List<List<Object>> checkoutList = actions.get("checkout");
+            if (checkoutList != null && !checkoutList.isEmpty()) {
+                List<Object> latestCheckout = checkoutList.stream()
+                        .max(Comparator.comparing(o -> o.get(4).toString())) // Lấy checkout muộn nhất
+                        .orElse(null);
+                if (latestCheckout != null) result.add(latestCheckout);
+            }
+        }
+
+        // Sắp xếp kết quả theo ngày giảm dần
+        result.sort((a, b) -> b.get(4).toString().compareTo(a.get(4).toString()));
+
+        return result;
+    }
+
     private void saveGoogleSheet(LocationRequestDto locationInfoDTO,
             String spreadsheetId, String range, String message) throws Exception {
         Sheets service = getSheetsService();

@@ -3,17 +3,13 @@ package com.mm.timesheet.Utility;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 
 import static com.mm.timesheet.Utility.GoogleSheetsConst.APPLICATION_NAME;
 
@@ -30,7 +26,7 @@ public class GoogleSheetsUtils {
     }
 
     public static Sheets getSheetsService() throws Exception {
-//        FileInputStream serviceAccountStream = new FileInputStream(googleApiKey);
+//        FileInputStream serviceAccountStream = new FileInputStream("C:\\Users\\Admin\\AppData\\Local\\Temp\\credentials.json");
 //        GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccountStream)
 //                .createScoped(Collections.singleton(SheetsScopes.SPREADSHEETS));
         GoogleCredentials credentials = GoogleCredentials

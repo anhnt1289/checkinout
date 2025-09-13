@@ -3,11 +3,17 @@ package com.mm.timesheet.Dto;
 public class ResponseDto {
     private String status;
     private String message;
+    private Object data;
 
     // Constructor
     public ResponseDto(String status, String message) {
         this.status = status;
         this.message = message;
+    }
+    public ResponseDto(String status, String message, Object data) {
+        this.status = status;
+        this.message = message;
+        this.data = data;
     }
 
     // Getters và Setters
@@ -25,5 +31,13 @@ public class ResponseDto {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
 }
