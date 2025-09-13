@@ -325,7 +325,7 @@
             if (loginData && isLoginValid(loginData.timestamp)) {
               getLocation(loginData.email, action);
             } else {
-              showDialog();
+              showDialogSession();
               checkGoogleLogin();
               // Nếu phiên không hợp lệ, ẩn nút "View History"
               document.getElementById('view-history-button').style.display = 'none';
@@ -384,21 +384,21 @@
           try {
             const response = JSON.parse(xhr.responseText);
             const isSuccess = response.message.includes("You are within");
-            showDialog(isSuccess, response.message);
+            showDialogAfterCallAPI(isSuccess, response.message);
 			initMap(userLat, userLon);
 			// Nếu đăng nhập hợp lệ, hiển thị nút "View History"
 			document.getElementById('view-history-button').style.display = 'block';
           } catch (e) {
-            showDialog(false, "Invalid response from server");
+            showDialogAfterCallAPI(false, "Invalid response from server");
           }
         } else {
-          showDialog(false, `Failed: ${xhr.status}`);
+          showDialogAfterCallAPI(false, `Failed: ${xhr.status}`);
 	      // Ẩn spinner khi có phản hồi
 	      document.getElementById('loading-spinner').style.display = 'none';
         }
       };
       xhr.onerror = function () { 
-		  showDialog(false, "Network error"); 
+		  showDialogAfterCallAPI(false, "Network error"); 
 	  };
       xhr.send(JSON.stringify(payload));
     }
@@ -415,7 +415,7 @@
 
     window.onload = checkGoogleLogin;
 
-    function showDialog(isSuccess, message) {
+    function showDialogAfterCallAPI(isSuccess, message) {
       const overlay = document.createElement("div");
       overlay.className = "custom-dialog-overlay";
       const dialog = document.createElement("div");
@@ -427,7 +427,7 @@
     }
 	
 	  // Hàm hiển thị dialog
-    function showDialog() {
+    function showDialogSession() {
         document.getElementById("overlay").classList.add("show");
         document.getElementById("dialog").classList.add("show");
     }
@@ -441,6 +441,7 @@
   </script>
 </body>
 </html>
+
 
 
 
