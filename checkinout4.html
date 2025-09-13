@@ -263,7 +263,11 @@
 </head>
 <body>
   <h2>Click to Check-in or Check-out</h2>
-
+  <!-- Phần tử spinner cho trạng thái chờ -->
+  <div id="loading-spinner" style="display: none; text-align: center;">
+    <img src="https://i.gifer.com/YCZH.gif" alt="Loading..." style="width: 50px; height: 50px;">
+    <p>Đang chờ...</p>
+  </div>
   <!-- Màn che nền -->
   <div class="overlay" id="overlay"></div>
 	
@@ -367,11 +371,15 @@
     }
 
     function sendLocationToBackend(lat, lon, action, email) {
+	  // Hiển thị spinner
+  	  document.getElementById('loading-spinner').style.display = 'block';
       const xhr = new XMLHttpRequest();
       xhr.open("POST", "https://checkinout-production.up.railway.app/api/location/send", true);
       xhr.setRequestHeader("Content-Type", "application/json");
       const payload = { lat, lon, action, user: email };
       xhr.onload = function () {
+	    // Ẩn spinner khi có phản hồi
+	    document.getElementById('loading-spinner').style.display = 'none';
         if (xhr.status === 200) {
           try {
             const response = JSON.parse(xhr.responseText);
@@ -385,9 +393,13 @@
           }
         } else {
           showDialog(false, `Failed: ${xhr.status}`);
+	      // Ẩn spinner khi có phản hồi
+	      document.getElementById('loading-spinner').style.display = 'none';
         }
       };
-      xhr.onerror = function () { showDialog(false, "Network error"); };
+      xhr.onerror = function () { 
+		  showDialog(false, "Network error"); 
+	  };
       xhr.send(JSON.stringify(payload));
     }
 
@@ -429,6 +441,7 @@
   </script>
 </body>
 </html>
+
 
 
 
