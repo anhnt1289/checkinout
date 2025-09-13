@@ -446,7 +446,7 @@
             const response = JSON.parse(xhr.responseText);
             const isSuccess = response.message.includes("You are within");
             showDialogAfterCallAPI(isSuccess, response.message);
-			initMap(userLat, userLon);
+			initMap(lat, lon);
 			// Nếu đăng nhập hợp lệ, hiển thị nút "View History"
 			document.getElementById('view-history-button').style.display = 'block';
           } catch (e) {
@@ -504,6 +504,7 @@
   </script>
 </body>
 </html>
+
 
 
 
