@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History Check-in/Check-out</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .status-checkin {
+            color: #28a745;
+        }
+        .status-checkout {
+            color: #dc3545;
+        }
+
+        /* Responsive design for mobile devices */
+        @media (max-width: 768px) {
+            table {
+                width: 95%;
+            }
+            th, td {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                font-size: 18px;
+                padding: 10px;
+            }
+            table {
+                width: 100%;
+            }
+            th, td {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+
+        /* Các thuộc tính chung cho dialog */
+        .dialog {
+            display: none; /* Ẩn dialog mặc định */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 80%;
+            max-width: 400px;
+            z-index: 1000;
+        }
+
+        /* Màn che nền khi hiển thị dialog */
+        .overlay {
+            display: none; /* Ẩn nền */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        /* Tiêu đề của dialog */
+        .dialog-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff5733;
+            margin-bottom: 10px;
+        }
+
+        /* Nội dung của dialog */
+        .dialog-message {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* Nút đóng của dialog */
+        .close-btn {
+            background-color: #ff5733;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .close-btn:hover {
+            background-color: #e04e2d;
+        }
+
+        /* Hiệu ứng khi dialog hiển thị */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        /* Áp dụng hiệu ứng cho dialog */
+        .dialog.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+    </style>
+  
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+<header>
+    <h1>Lịch sử Check-in/Check-out</h1>
+</header>
+<!-- Màn che nền -->
+<div class="overlay" id="overlay"></div>
+
+<!-- Dialog box -->
+<div class="dialog" id="dialog">
+    <div class="dialog-header">
+        Session Expired
+    </div>
+    <div class="dialog-message">
+        Your session has expired. Please login again to continue.
+    </div>
+    <button class="close-btn" onclick="closeDialog()">OK</button>
+</div>
+<div class="content">
+    <table>
+        <thead>
+            <tr>
+                <th>Trạng thái</th>
+                <th>Email</th>
+                <th>Thời gian</th>
+                <th>Thông tin vị trí</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dữ liệu sẽ được hiển thị ở đây -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Khi trang tải, gọi hàm loadCheckInOutHistory
+    window.onload = function() {
+        // Lấy email người dùng từ localStorage
+        const loginData = JSON.parse(localStorage.getItem('loginData'));
+        if (loginData && isLoginValid(loginData.timestamp)) {
+            loadCheckInOutHistory(loginData.email);
+        } else {
+            showDialog();
+        }
+    };
+
+    // Hàm tải lịch sử check-in/check-out từ API
+    function loadCheckInOutHistory(userLogin) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", `https://checkinout-production.up.railway.app/api/location/getCheckInOutHistory?userLogin=${userLogin}`, true);
+
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                const response = JSON.parse(xhr.responseText);
+                if (response.status === 'success') {
+                    displayHistory(response.data); // Hiển thị lịch sử
+                } else {
+                    console.error("Lỗi khi tải dữ liệu:", response.message);
+                }
+            } else {
+                console.error("Lỗi khi gửi yêu cầu:", xhr.statusText);
+            }
+        };
+
+        xhr.onerror = function () {
+            console.error("Có lỗi xảy ra trong quá trình yêu cầu API.");
+        };
+
+        xhr.send();
+    }
+
+    // Hàm hiển thị dữ liệu lên bảng
+    function displayHistory(data) {
+        const tbody = document.querySelector('table tbody');
+        tbody.innerHTML = ''; // Xóa các dòng cũ trong bảng
+
+        // Duyệt qua từng phần tử dữ liệu và hiển thị lên bảng
+        data.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="${item[2] === 'checkin' ? 'status-checkin' : 'status-checkout'}">${item[2]}</td>
+                <td>${item[3]}</td>
+                <td>${item[4]}</td>
+                <td>${item[5]}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+	
+	// Hàm hiển thị dialog
+    function showDialog() {
+        document.getElementById("overlay").classList.add("show");
+        document.getElementById("dialog").classList.add("show");
+    }
+
+    // Hàm đóng dialog
+    function closeDialog() {
+        document.getElementById("overlay").classList.remove("show");
+        document.getElementById("dialog").classList.remove("show");
+        // Redirect or take other actions after closing dialog
+    }
+</script>
+
+</body>
+</html>
