@@ -264,6 +264,19 @@
 <body>
   <h2>Click to Check-in or Check-out</h2>
 
+  <!-- Màn che nền -->
+  <div class="overlay" id="overlay"></div>
+	
+  <!-- Dialog box -->
+  <div class="dialog" id="dialog">
+	  <div class="dialog-header">
+			Session Expired
+	  </div>
+	  <div class="dialog-message">
+		  Your session has expired. Please login again to continue.
+	  </div>
+	  <button class="close-btn" onclick="closeDialog()">OK</button>
+  </div>
   <div class="container">
     <div class="buttons-container">
       <button class="checkin" onclick="checkGeolocationPermission('checkin')">Check-in</button>
@@ -416,6 +429,7 @@
   </script>
 </body>
 </html>
+
 
 
 
